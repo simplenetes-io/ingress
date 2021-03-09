@@ -1,0 +1,5 @@
+@clone: file
+
+run:
+    _env:
+        - RUN: FETCHER_RUN
