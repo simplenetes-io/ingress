@@ -1,4 +1,4 @@
-@clone: file
+@clone: file:1.6.0
 
 run:
     _env:
