@@ -1,19 +1,21 @@
 api: 1.0.0-beta1
 runtime: podman
-podVersion: 0.0.14
+podVersion: 0.0.15
 
 volumes:
       # conf name hardcoded into the ingress generator and cannot be changed.
-      # The generated haproxy.conf file is written to it inside the cluster project `_config` directory.
+      # The generated haproxy.conf file is written to it inside the cluster project `cluster_dir/_config/ingress/conf` directory.
     - name: conf
       type: config
-      # Certs provided by the auto issuer pod (letsencrypt pod)
+
+      # Certs provided by the auto issuer pod (letsencrypt pod) are fetched to this volume.
       # If these auto certs are not used, this volume must still be present otherwise the haproxy.conf will fail.
     - name: autocerts
       type: ramdisk
-      size: 10M
+      size: 28M
+
       # User provided certs, such as Extended Validation certificates which include human validation.
-      # Certs are to be placed here manually be the user and synced.
+      # Certs are to be placed here (`cluster_dir/_config/ingress/usercerts`) manually be the user and synced.
     - name: usercerts
       type: config
       # We can make this into an encrypted secret (when that feature is implemented in snt).
@@ -22,19 +24,26 @@ containers:
 #ifdef ${useFetcher}
     - name: fetcher
       # TODO: change image name to actual repo
-      image: registry.gitlab.com/blockie/tmp-image-registry:ingress-fetcher-0.2
+      image: ingress-fetcher:0.0.2
       # Restart this container once each 12 hours to fetch any updated certificates.
       restart: on-interval:43200
       env:
             # This is the cluster port the Letsencrypt pod is listening to.
+            # Set it as en env variable which our "fetcher" program will use.
           - name: autoCertClusterPort
             value: 64000
       mounts:
+          # This is the RAMDISK defined above, to here fetched certificates are written.
+          # The destination is hardcoded into the fetcher program.
           - volume: autocerts
             dest: /mnt/autocerts
       startupProbe:
+          # Allow 20 seconds for the container to get started.
           timeout: 20
+
+          # Our probe is simply that we wait for the container to exit with code 0.
           exit: true
+
           # Signal the haproxy container to reload when we exit successfully.
           # This will make the haproxy container reload once every 12 h, regardless of there are new certs or not. But there's no harm in doing this so instead
           # of complicating the logic of not reloading when there are no new certs, we KISS it and only provide this simpler path.
