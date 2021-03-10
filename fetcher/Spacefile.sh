@@ -27,7 +27,7 @@ FETCHER_RUN()
     local hash="$(FILE_CHECKSUM "${tarFile}")"
 
     if [ -f "${hashFile}" ]; then
-        if printf "%s\\n" "${hash}" |diff - "${hashFile}" 2>/dev/null >&2; then
+        if printf "%s\\n" "${hash}" | diff - "${hashFile}" 2>/dev/null >&2; then
             return 0
         fi
     fi
