@@ -23,7 +23,7 @@ volumes:
 containers:
 #ifdef ${useFetcher}
     - name: fetcher
-      image: docker.pkg.github.com/simplenetes-io/ingress/ingress-fetcher:0.0.15
+      image: docker.pkg.github.com/simplenetes-io/ingress/ingress-fetcher:${podVersion}
       # Restart this container once each 12 hours to fetch any updated certificates.
       restart: on-interval:43200
       env:
