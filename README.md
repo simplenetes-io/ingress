@@ -3,9 +3,9 @@
 The official Simplenetes Ingress Pod, which uses `haproxy` as router.
 
 ```sh
-snt attach-pod ingress@loadbalancer
-snt import-config ingress
-snt compile ingress
-snt generate-ingress
-snt update-config ingress
+sns attach-pod ingress@loadbalancer
+sns import-config ingress
+sns compile ingress
+sns generate-ingress
+sns update-config ingress
 ```
