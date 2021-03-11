@@ -24,7 +24,7 @@ containers:
 #ifdef ${useFetcher}
     - name: fetcher
       # TODO: change image name to actual repo
-      image: ingress-fetcher:0.0.2
+      image: docker.pkg.github.com/simplenetes-io/ingress/ingress-fetcher:0.0.15
       # Restart this container once each 12 hours to fetch any updated certificates.
       restart: on-interval:43200
       env:
