@@ -1,5 +1,6 @@
 log
 pod
+*.cache
 .pod.yaml
 .pod.status
 pod.portmappings.conf

@@ -28,6 +28,7 @@ FETCHER_RUN()
 
     if [ -f "${hashFile}" ]; then
         if printf "%s\\n" "${hash}" | diff - "${hashFile}" 2>/dev/null >&2; then
+            PRINT "No change in certs, not unpacking." "debug" 0
             return 0
         fi
     fi
@@ -42,8 +43,11 @@ FETCHER_RUN()
     # will get wiped anyways.
     if tar -xvzf "${tarFile}" -C "${tmpDir}"; then
         printf "%s\\n" "${hash}" >"${hashFile}"
-        mv "${tmpDir}"/*.pem "${certDir}"
-        PRINT "Unpacked certs" "ok" 0
+        if ! mv -v "${tmpDir}"/*.pem "${certDir}" 2>/dev/null; then
+            PRINT "No .pem files present in archive." "debug" 0
+        else
+            PRINT "Unpacked certs" "ok" 0
+        fi
     else
         PRINT "Could not untar file" "error" 0
         return 1
