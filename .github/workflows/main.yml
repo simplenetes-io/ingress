@@ -26,8 +26,8 @@ jobs:
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          registry: docker.pkg.github.com
-          repository: simplenetes-io/ingress/ingress-fetcher
+          registry: ghcr.io
+          repository: simplenetes-io/ingress-fetcher
           path: ./fetcher
           dockerfile: ./fetcher/Dockerfile
           tag_with_ref: true
