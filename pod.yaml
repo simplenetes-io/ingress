@@ -1,6 +1,6 @@
 api: 1.0.0-beta1
 runtime: podman
-podVersion: 0.0.23
+podVersion: 0.1.0
 
 volumes:
       # conf name hardcoded into the ingress generator and cannot be changed.
@@ -73,8 +73,10 @@ containers:
             # These ports we mount only in real mode
           - targetPort: 80
             hostPort: 80
+            hostInterface: 0.0.0.0
           - targetPort: 443
             hostPort: 443
+            hostInterface: 0.0.0.0
 #endif
 #ifdef ${DEVMODE}
             # These ports we mount in dev mode
