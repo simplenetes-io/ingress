@@ -15,7 +15,7 @@ volumes:
       size: 28M
 
       # User provided certs, such as Extended Validation certificates which include human validation.
-      # Certs are to be placed here (`cluster_dir/_config/ingress/usercerts`) manually be the user and synced.
+      # Certs are to be placed here (`cluster_dir/_config/ingress/usercerts`) manually by the user and synced.
     - name: usercerts
       type: config
       # We can make this into an encrypted secret (when that feature is implemented in sns).
