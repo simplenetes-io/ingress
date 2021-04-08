@@ -1,15 +1,22 @@
-api: 1.0.0-beta1
+api: 1.0.0-beta2
 runtime: podman
-podVersion: 0.1.1
+podVersion: 0.2.0
 
 volumes:
       # conf name hardcoded into the ingress generator and cannot be changed.
-      # The generated haproxy.conf file is written to it inside the cluster project `cluster_dir/_config/ingress/conf` directory.
+      # The generated haproxy.cfg file is written to it inside the cluster project `cluster_dir/_config/ingress/conf` directory.
+#ifntrue ${DEVMODE}
     - name: conf
       type: config
+#endif
+#iftrue ${DEVMODE}
+    # In DEVMODE we have to use a already existing haproxy.cfg
+    - name: _devconf
+      type: config
+#endif
 
       # Certs provided by the auto issuer pod (letsencrypt pod) are fetched to this volume.
-      # If these auto certs are not used, this volume must still be present otherwise the haproxy.conf will fail.
+      # If these auto certs are not used, this volume must still be present otherwise the haproxy.cfg will fail.
     - name: autocerts
       type: ramdisk
       size: 28M
@@ -21,7 +28,7 @@ volumes:
       # We can make this into an encrypted secret (when that feature is implemented in sns).
       encrypted: false
 containers:
-#ifdef ${useFetcher}
+#iftrue ${useFetcher}
     - name: fetcher
       image: ghcr.io/simplenetes-io/ingress-fetcher:${podVersion}
       # Restart this container once each 12 hours to fetch any updated certificates.
@@ -53,6 +60,9 @@ containers:
     - name: haproxy
       image: haproxy:2.1.3-alpine
       restart: always
+      # Using the host network means that haproxy will bind directly to the host interface,
+      # and no port mappings need to be done.
+      network: host
       signal:
           - sig: USR2
       command:
@@ -66,22 +76,11 @@ containers:
             dest: /mnt/usercerts
           - volume: autocerts
             dest: /mnt/autocerts
+#iftrue ${DEVMODE}
+          - volume: _devconf
+            dest: /mnt/conf
+#endif
+#ifntrue ${DEVMODE}
           - volume: conf
             dest: /mnt/conf
-      expose:
-#ifndef ${DEVMODE}
-            # These ports we mount only in real mode
-          - targetPort: 80
-            hostPort: 80
-            hostInterface: 0.0.0.0
-          - targetPort: 443
-            hostPort: 443
-            hostInterface: 0.0.0.0
-#endif
-#ifdef ${DEVMODE}
-            # These ports we mount in dev mode
-          - targetPort: 80
-            hostPort: 8080
-          - targetPort: 443
-            hostPort: 4434
 #endif
