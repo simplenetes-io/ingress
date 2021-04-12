@@ -5,12 +5,12 @@ podVersion: 0.2.0
 volumes:
       # conf name hardcoded into the ingress generator and cannot be changed.
       # The generated haproxy.cfg file is written to it inside the cluster project `cluster_dir/_config/ingress/conf` directory.
-#ifntrue ${DEVMODE}
+#ifntrue ${devmode}
     - name: conf
       type: config
 #endif
-#iftrue ${DEVMODE}
-    # In DEVMODE we have to use a already existing haproxy.cfg
+#iftrue ${devmode}
+    # In devmode we have to use a already existing haproxy.cfg
     - name: _devconf
       type: config
 #endif
@@ -76,11 +76,11 @@ containers:
             dest: /mnt/usercerts
           - volume: autocerts
             dest: /mnt/autocerts
-#iftrue ${DEVMODE}
+#iftrue ${devmode}
           - volume: _devconf
             dest: /mnt/conf
 #endif
-#ifntrue ${DEVMODE}
+#ifntrue ${devmode}
           - volume: conf
             dest: /mnt/conf
 #endif
